@@ -1,26 +1,30 @@
 from .abstract import ParametrizedLayer
 from ..core.warnings import restrict_parallel
+from ..core.initializers import initializer_registry
 import numpy as np
 
 
 
 class LinearLayer(ParametrizedLayer):
-    def __init__(self, in_size, out_size):
-        self.W = np.random.randn(in_size, out_size)
-        self.b = np.zeros((1, out_size))
+    def __init__(self, shape, w_init='xavier_normal', b_initial=0):
+        self.shape = shape
+        
+        # TODO:
+        # - Add initalization more flexible
+        self.W = initializer_registry[w_init](shape)
+        self.b = b_initial * np.ones((shape[0], 1))
+
         self.params = [self.W, self.b]
-        self.gradW = None
-        self.gradB = None
-        self.gradInput = None
 
     @restrict_parallel
     def _fwd_prop(self, X):
         self.X = X
-        return X.dot(self.W) + self.b
+        return self.W.dot(X) + self.b
 
     @restrict_parallel
-    def _bckwd_prop(self, grad_out):
-        self.gradW = self.X.T.dot(grad_out)
-        self.gradB = np.mean(grad_out, axis=0)
-        self.gradInput = grad_out.dot(self.W.T)
-        return self.gradInput, [self.gradW, self.gradB]
+    def _bckwd_prop(self, dOut):
+        grad_W = dOut.dot(self.X.T)
+        grad_b = dOut
+        grad_in = self.W.T.dot(dOut)
+
+        return grad_in, (grad_W, grad_b)
