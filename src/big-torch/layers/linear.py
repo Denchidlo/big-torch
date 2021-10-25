@@ -9,22 +9,18 @@ class LinearLayer(ParametrizedLayer):
     def __init__(self, shape, w_init='xavier_normal', b_initial=0):
         self.shape = shape
         
-        # TODO:
-        # - Add initalization more flexible
+        # TODO: Make initalization more flexible
         self.W = initializer_registry[w_init](shape)
         self.b = b_initial * np.ones((shape[0], 1))
 
         self.params = [self.W, self.b]
 
-    @restrict_parallel
     def _fwd_prop(self, X):
-        self.X = X
-        return self.W.dot(X) + self.b
+        return self.W.dot(X) + self.b, X
 
-    @restrict_parallel
-    def _bckwd_prop(self, dOut):
-        grad_W = dOut.dot(self.X.T)
-        grad_b = dOut
-        grad_in = self.W.T.dot(dOut)
+    def _bckwd_prop(self, X, d_out):
+        grad_W = d_out.dot(X)
+        grad_b = d_out
+        grad_in = self.W.T.dot(d_out)
 
         return grad_in, (grad_W, grad_b)
