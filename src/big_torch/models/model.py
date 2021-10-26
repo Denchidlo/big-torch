@@ -23,7 +23,7 @@ class Model:
             loss, predict = self.common.loss_function._fwd_prop((self.last_predict, y))
             d_out, _ = self.common.loss_function._bckwd_prop(predict, y)
             
-            idx = len(self.common.layers[:-1])
+            idx = len(self.common.layers)
             for layer in reversed(self.common.layers):
                 idx -= 1
                 d_out, grad = layer._bckwd_prop(self.bprop_context[idx], d_out)
@@ -33,7 +33,7 @@ class Model:
             
             return loss, self.gradient_context
 
-        def train_step(self, x, y):
+        def train_step(self, x, y, show_metrics=False):
             """
                 Parameters:
                  * x - Flatten vector x
@@ -49,7 +49,7 @@ class Model:
             self.layers = layers
 
         def transform(self, gradients, eta):
-            for idx, layer in enumerate(self.layers):
+            for idx, layer in enumerate(reversed(self.layers)):
                 layer.change(gradients[idx], eta)
                 
     def __init__(self) -> None:
@@ -66,9 +66,10 @@ class Model:
         self._parametrised_layers = [layer for layer in self.layers if isinstance(layer, ParametrizedLayer)]
         self.params = self._ModelParams(self._parametrised_layers)
 
-    def ask_oracul(self, X, y, n_jobs=None):
+    def ask_oracul(self, X, y, n_jobs=None, level=2):
         worker = self._ModelInstance(self)
-        return worker.train_step(X, y)
+        if level == 2:
+            return worker.train_step(X, y)
 
     def predict(self, X):
         worker = self._ModelInstance(self)

@@ -19,8 +19,8 @@ class LinearLayer(ParametrizedLayer):
         return X.dot(self.W) + self.b, X
 
     def _bckwd_prop(self, X, d_out):
-        grad_W = X.T.dot(d_out) / d_out.dtype(d_out.shape[0])
-        grad_b = np.mean(d_out, axis=0, keepdims=True)
+        grad_W = X.T.dot(d_out)
+        grad_b = np.mean(d_out, axis=0)
         grad_in = d_out.dot(self.W.T)
 
         return grad_in, (grad_W, grad_b)

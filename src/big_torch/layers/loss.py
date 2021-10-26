@@ -2,6 +2,9 @@ import numpy as np
 from .abstract import AbstractLayer
 
 class CrossEntropy(AbstractLayer):
+    def __init__(self, shape, softmax_prev=False) -> None:
+        super().__init__(shape)
+
     def _fwd_prop(self, result_tuple):
         """
             Warning: Do not call it implicitly
@@ -12,7 +15,8 @@ class CrossEntropy(AbstractLayer):
         y = result_tuple[1]
         y_hat = result_tuple[0]
 
-        losses = - (y * np.log(y_hat))
+        losses = - np.log(y_hat)
+        losses[y == 0] = 0
 
         return np.mean(losses), y_hat
 
@@ -24,4 +28,4 @@ class CrossEntropy(AbstractLayer):
                 * X - prediction vector
                 * d_out - vector of true results
         """
-        return (d_out * np.power(X, -1)) / X.shape[0], None
+        return d_out, None
