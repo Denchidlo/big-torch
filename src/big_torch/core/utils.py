@@ -10,4 +10,4 @@ class ModuleAggregator:
             self._registry[name if name != None else func.__name__] = func
             return func
 
-        return wrapper    
+        return wrapper

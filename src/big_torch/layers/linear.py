@@ -4,11 +4,10 @@ from ..core.initializers import initializer_registry
 import numpy as np
 
 
-
 class LinearLayer(ParametrizedLayer):
-    def __init__(self, shape, w_init='xavier_normal', b_initial=0):
+    def __init__(self, shape, w_init="xavier_normal", b_initial=0):
         self.shape = shape
-        
+
         # TODO: Make initalization more flexible
         self.W = initializer_registry[w_init](shape)
         self.b = b_initial * np.ones((1, shape[1]))

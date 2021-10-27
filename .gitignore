@@ -1,8 +1,18 @@
 # Byte-compiled / optimized / DLL files
-data_mnist
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Manualy added
+data_mnist
+*.ipynb
+lib.py
+dist
+*.egg-info
+
+# Temporary excluded
+*.yml
+*.toml
 
 # C extensions
 *.so

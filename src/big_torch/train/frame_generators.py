@@ -1,17 +1,19 @@
 from typing import Any
 import numpy as np
-from numpy.random.mtrand import choice 
+from numpy.random.mtrand import choice
 
-class FrameGenerator():
+
+class FrameGenerator:
     """
-        Train DataFrame Generator:
+    Train DataFrame Generator:
 
-        Usage:
-            
-            >>> frame_generator = FrameGenerator(train_x, train_y)
+    Usage:
 
-            >>> x_batch, y_batch = next(frame_generator)
+        >>> frame_generator = FrameGenerator(train_x, train_y)
+
+        >>> x_batch, y_batch = next(frame_generator)
     """
+
     def __init__(self, train_x, train_y) -> None:
         self.train_x = train_x
         self.train_y = train_y

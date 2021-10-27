@@ -4,17 +4,19 @@ import numpy as np
 
 POOL = None
 
+
 def open_pool_session(n_jobs):
     global POOL
     POOL = mp.Pool(n_jobs).__enter__()
+
 
 def close_pool_session():
     global POOL
     POOL.__exit__(None, None, None)
     POOL = None
 
-class Model:
 
+class Model:
     class _ModelInstance:
         def __init__(self, fabric):
             self.common = fabric
@@ -35,15 +37,15 @@ class Model:
             # Note that it's the only place were we call loss function
             loss, predict = self.common.loss_function._fwd_prop((self.last_predict, y))
             d_out, _ = self.common.loss_function._bckwd_prop(predict, y)
-            
+
             idx = len(self.common.layers)
             for layer in reversed(self.common.layers):
                 idx -= 1
                 d_out, grad = layer._bckwd_prop(self.bprop_context[idx], d_out)
-                
-                if not grad is None: 
+
+                if not grad is None:
                     self.gradient_context.append(grad)
-            
+
             return loss, self.gradient_context
 
         @staticmethod
@@ -53,8 +55,6 @@ class Model:
             loss, gradient_context = self._back_propogate(y)
 
             return loss, gradient_context
-
-
 
     class _ModelParams:
         def __init__(self, layers) -> None:
@@ -72,11 +72,9 @@ class Model:
 
             return resulting
 
-
-
     def __init__(self) -> None:
         self.layers = []
-        self.loss_function = None   
+        self.loss_function = None
 
     def add_layer(self, layer):
         self.layers.append(layer)
@@ -85,10 +83,12 @@ class Model:
         self.loss_function = loss
 
     def build(self):
-        self._parametrised_layers = [layer for layer in self.layers if isinstance(layer, ParametrizedLayer)]
+        self._parametrised_layers = [
+            layer for layer in self.layers if isinstance(layer, ParametrizedLayer)
+        ]
         self.params = self._ModelParams(self._parametrised_layers)
 
-    def ask_oracul(self, X, y, n_jobs=1):
+    def ask_oracle(self, X, y, n_jobs=1):
 
         if n_jobs <= 0:
             n_jobs = 4
@@ -100,18 +100,18 @@ class Model:
                 np.array_split(y, n_jobs),
             ]
             payload = list(zip(*payload))
-            
+
             global POOL
-            results = POOL.map(self._ModelInstance.train_step, iterable=payload, chunksize=1)
+            results = POOL.map(
+                self._ModelInstance.train_step, iterable=payload, chunksize=1
+            )
 
             loss = np.mean([el[0] for el in results])
             grads = self.params._avg_grads([el[1] for el in results])
         else:
-            loss, grads = self._ModelInstance.train_step((
-                self._ModelInstance(self),
-                X,
-                y
-            ))
+            loss, grads = self._ModelInstance.train_step(
+                (self._ModelInstance(self), X, y)
+            )
 
         return loss, grads
 

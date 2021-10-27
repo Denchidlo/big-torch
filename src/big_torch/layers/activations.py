@@ -1,13 +1,14 @@
 import numpy as np
 from .abstract import AbstractLayer
 
+
 class Sigmoid(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)
 
     def _fwd_prop(self, X):
         out = 1 / (1 + np.exp(-X))
-        return  out, out
+        return out, out
 
     def _bckwd_prop(self, X, d_out):
         return X * (1 - X) * d_out, None

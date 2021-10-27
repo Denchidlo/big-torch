@@ -1,7 +1,8 @@
 from abc import abstractmethod
 import numpy as np
 
-class AbstractLayer():
+
+class AbstractLayer:
     def __init__(self, shape) -> None:
         self.shape = shape
 
