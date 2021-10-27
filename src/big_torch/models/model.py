@@ -1,4 +1,17 @@
 from ..layers.abstract import ParametrizedLayer
+import multiprocessing as mp
+import numpy as np
+
+POOL = None
+
+def open_pool_session(n_jobs):
+    global POOL
+    POOL = mp.Pool(n_jobs).__enter__()
+
+def close_pool_session():
+    global POOL
+    POOL.__exit__(None, None, None)
+    POOL = None
 
 class Model:
 
@@ -33,16 +46,15 @@ class Model:
             
             return loss, self.gradient_context
 
-        def train_step(self, x, y, show_metrics=False):
-            """
-                Parameters:
-                 * x - Flatten vector x
-                 * y - Target vector
-            """
+        @staticmethod
+        def train_step(args):
+            self, x, y = args
             self._forward(x)
             loss, gradient_context = self._back_propogate(y)
 
             return loss, gradient_context
+
+
 
     class _ModelParams:
         def __init__(self, layers) -> None:
@@ -51,11 +63,21 @@ class Model:
         def transform(self, gradients, eta):
             for idx, layer in enumerate(reversed(self.layers)):
                 layer.change(gradients[idx], eta)
-                
+
+        def _avg_grads(self, gradients_list):
+            resulting = []
+
+            for idx, layer in enumerate(reversed(self.layers)):
+                resulting.append(layer.average([el[idx] for el in gradients_list]))
+
+            return resulting
+
+
+
     def __init__(self) -> None:
         self.layers = []
-        self.loss_function = None
-    
+        self.loss_function = None   
+
     def add_layer(self, layer):
         self.layers.append(layer)
 
@@ -66,10 +88,32 @@ class Model:
         self._parametrised_layers = [layer for layer in self.layers if isinstance(layer, ParametrizedLayer)]
         self.params = self._ModelParams(self._parametrised_layers)
 
-    def ask_oracul(self, X, y, n_jobs=None, level=2):
-        worker = self._ModelInstance(self)
-        if level == 2:
-            return worker.train_step(X, y)
+    def ask_oracul(self, X, y, n_jobs=1):
+
+        if n_jobs <= 0:
+            n_jobs = 4
+
+        if n_jobs != 1:
+            payload = [
+                [self._ModelInstance(self) for _ in range(n_jobs)],
+                np.array_split(X, n_jobs),
+                np.array_split(y, n_jobs),
+            ]
+            payload = list(zip(*payload))
+            
+            global POOL
+            results = POOL.map(self._ModelInstance.train_step, iterable=payload, chunksize=1)
+
+            loss = np.mean([el[0] for el in results])
+            grads = self.params._avg_grads([el[1] for el in results])
+        else:
+            loss, grads = self._ModelInstance.train_step((
+                self._ModelInstance(self),
+                X,
+                y
+            ))
+
+        return loss, grads
 
     def predict(self, X):
         worker = self._ModelInstance(self)

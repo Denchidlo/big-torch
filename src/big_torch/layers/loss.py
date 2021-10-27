@@ -18,7 +18,7 @@ class CrossEntropy(AbstractLayer):
         losses = - np.log(y_hat)
         losses[y == 0] = 0
 
-        return np.mean(losses), y_hat
+        return np.sum(losses) / y.shape[0], y_hat
 
     def _bckwd_prop(self, X, d_out):
         """

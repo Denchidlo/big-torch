@@ -46,7 +46,4 @@ class Softmax(AbstractLayer):
         return out, out
 
     def _bckwd_prop(self, X, d_out):
-        dx = X.copy()
-        dx[d_out != 0] -= 1
-        dx /= d_out.shape[0]
-        return dx, None
+        return (X - d_out) / d_out.shape[0], None

@@ -18,5 +18,10 @@ class ParametrizedLayer(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)
 
+    @abstractmethod
     def change(self, step, eta):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def average(self, gradients_list):
         raise NotImplementedError()

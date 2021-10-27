@@ -13,8 +13,6 @@ class LinearLayer(ParametrizedLayer):
         self.W = initializer_registry[w_init](shape)
         self.b = b_initial * np.ones((1, shape[1]))
 
-        self.params = [self.W, self.b]
-
     def _fwd_prop(self, X):
         return X.dot(self.W) + self.b, X
 
@@ -23,8 +21,13 @@ class LinearLayer(ParametrizedLayer):
         grad_b = np.mean(d_out, axis=0)
         grad_in = d_out.dot(self.W.T)
 
-        return grad_in, (grad_W, grad_b)
+        return grad_in, [grad_W, grad_b]
 
     def change(self, step, eta):
         self.W -= eta * step[0]
         self.b -= eta * step[1]
+
+    def average(self, gradients_list):
+        w_list = [el[0] for el in gradients_list]
+        b_list = [el[1] for el in gradients_list]
+        return np.mean(w_list, axis=0), np.mean(b_list, axis=0)
