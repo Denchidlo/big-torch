@@ -1,2 +1,2 @@
-class NeptuneClient()
+class NeptuneClient():
     pass
