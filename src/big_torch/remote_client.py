@@ -1,11 +1,13 @@
-from ..preprocessing.cross_validation import train_test_split, one_hot_encoded
+from .preprocessing.cross_validation import train_test_split, one_hot_encoded
 
-from ..train.callbacks import callback_registry
-from ..preprocessing.scalers import scaler_registry
-from ..layers.abstract import layer_registry
+from .train.callbacks import callback_registry
+from .preprocessing.scalers import scaler_registry
+from .layers.abstract import layer_registry
 
-from ..train.fabric import OptimizatonFabric
-from ..models import Model
+from .train import OptimizatonFabric
+from .models import Model
+
+import numpy as np
 import json
 
 
@@ -21,14 +23,16 @@ class RemoteClient():
         mndata = MNIST(preprocessing_cfg['path'])
 
         x, y = mndata.load_training()
+        x = np.array(x)
+        y = np.array(y)
 
         if preprocessing_cfg['scaler'] != None:
-            x = scaler_registry[preprocessing_cfg['scaler']].fit_transform(x)
+            x = scaler_registry[preprocessing_cfg['scaler']]().fit_transform(x)
 
         y = one_hot_encoded(y, 10)
 
         t_x, t_y, v_x, v_y = train_test_split(
-            x, y, teyt_size=preprocessing_cfg['test_size'])
+            x, y, test_size=preprocessing_cfg['test_size'])
 
         self._context['train_x'] = t_x
         self._context['train_y'] = t_y
@@ -36,7 +40,7 @@ class RemoteClient():
         self._context['val_y'] = v_y
 
     def compile_model(self):
-        model_cfg = self.cfg['preprocessing']
+        model_cfg = self.cfg['model']
 
         net = Model()
         self._context['net'] = net
@@ -62,7 +66,7 @@ class RemoteClient():
             'optimizer': session_cfg['optimizer'],
             'generator_cfg': session_cfg['generator_cfg'],
             'optimizer_cfg': session_cfg['optimizer_cfg'],
-            'callbacks': [self.instantiate_callback(callback_cfg) for callback_cfg in session_cfg['optimizer_cfg']],
+            'callbacks': [self.instantiate_callback(callback_cfg) for callback_cfg in session_cfg['callbacks']],
         }
 
         self._context['fabric'] = OptimizatonFabric(**kwargs)

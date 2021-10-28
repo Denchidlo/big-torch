@@ -4,6 +4,7 @@ from ..preprocessing.initializers import initializer_registry
 import numpy as np
 
 
+@layer_registry.register('linear')
 class LinearLayer(ParametrizedLayer):
     def __init__(self, shape, w_init="xavier_normal", b_initial=0):
         self.shape = shape

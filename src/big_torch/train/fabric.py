@@ -1,4 +1,3 @@
-from ..core.utils import ModuleAggregator
 from ..models.model import open_pool_session, close_pool_session
 from .optimizers import optimizator_registry
 from .frame_generators import BasicGenerator, generator_registry

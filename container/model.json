@@ -1,0 +1,84 @@
+{
+    "preprocessing": {
+        "path": "./data_mnist",
+        "test_size": 10000,
+        "scaler": "min-max"
+    },
+    "model": {
+        "layers": [
+            {
+                "type": "linear",
+                "cfg": {
+                    "shape": [784, 100],
+                    "b_initial": 1,
+                    "w_init": "xavier_normal"
+                }
+            },
+            {
+                "type": "ReLU",
+                "cfg": {
+                    "shape": [100, 100]
+                }
+            },
+            {
+                "type": "linear",
+                "cfg": {
+                    "shape": [100, 100],
+                    "b_initial": 1,
+                    "w_init": "xavier_normal"
+                }
+            },
+            {
+                "type": "ReLU",
+                "cfg": {
+                    "shape": [100, 100]
+                }
+            },
+            {
+                "type": "linear",
+                "cfg": {
+                    "shape": [100, 10],
+                    "b_initial": 1,
+                    "w_init": "xavier_normal"
+                }
+            },
+            {
+                "type": "softmax",
+                "cfg": {
+                    "shape": [10, 10]
+                }
+            }
+        ],
+        "loss": {
+            "type": "multinomial_cross_entropy",
+            "cfg": {
+                "shape": [10, 1]
+            }
+        }
+    },
+    "run_session": {
+        "fabric": {
+            "generator": "random_batch",
+            "optimizer": "gradient_decent",
+            "generator_cfg": {
+                "batch_size": 1000
+            },
+            "optimizer_cfg": {
+                "eta": 0.1
+            },
+            "callbacks": [
+                {
+                    "type": "epoch_info",
+                    "cfg": {
+                        "validate": true,
+                        "metric": "accuracy"
+                    }
+                }
+            ]
+        },
+        "train_kwargs": {
+            "min_eps": 0.000005,
+            "max_iter": 3000
+        }
+    }
+}

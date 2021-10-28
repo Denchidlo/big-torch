@@ -2,6 +2,7 @@ import numpy as np
 from .abstract import AbstractLayer, layer_registry
 
 
+@layer_registry.register('multinomial_cross_entropy')
 class CrossEntropy(AbstractLayer):
     def __init__(self, shape, softmax_prev=False) -> None:
         super().__init__(shape)
