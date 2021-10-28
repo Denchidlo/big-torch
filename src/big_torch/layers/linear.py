@@ -1,4 +1,4 @@
-from .abstract import ParametrizedLayer
+from .abstract import AbstractLayer, layer_registry, ParametrizedLayer
 from ..core.warnings import restrict_parallel
 from ..preprocessing.initializers import initializer_registry
 import numpy as np

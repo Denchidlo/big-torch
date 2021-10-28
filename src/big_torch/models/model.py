@@ -35,7 +35,8 @@ class Model:
         def _back_propogate(self, y):
             # Loss function gradient init
             # Note that it's the only place were we call loss function
-            loss, predict = self.common.loss_function._fwd_prop((self.last_predict, y))
+            loss, predict = self.common.loss_function._fwd_prop(
+                (self.last_predict, y))
             d_out, _ = self.common.loss_function._bckwd_prop(predict, y)
 
             idx = len(self.common.layers)
@@ -68,7 +69,8 @@ class Model:
             resulting = []
 
             for idx, layer in enumerate(reversed(self.layers)):
-                resulting.append(layer.average([el[idx] for el in gradients_list]))
+                resulting.append(layer.average(
+                    [el[idx] for el in gradients_list]))
 
             return resulting
 

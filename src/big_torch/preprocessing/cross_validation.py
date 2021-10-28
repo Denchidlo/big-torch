@@ -1,4 +1,17 @@
 import numpy as np
+from ..core.utils import ModuleAggregator
+
+metric_registry = ModuleAggregator('metrics')
+
+
+def one_hot_encoded(y, num_class):
+    n = y.shape[0]
+    onehot = np.zeros((n, num_class), dtype="int32")
+    for i in range(n):
+        idx = y[i]
+        onehot[i][idx] = 1
+    return onehot
+
 
 def train_test_split(a, b, test_size):
     size = a.shape[0]
@@ -12,5 +25,7 @@ def train_test_split(a, b, test_size):
     return a[mask == 0], b[mask == 0], a[mask == 1], b[mask == 1]
 
 
+@metric_registry.register('accuracy')
 def class_accuracy(y_true, y_pred):
-    return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))  # both are not one hot encoded
+    # both are not one hot encoded
+    return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))

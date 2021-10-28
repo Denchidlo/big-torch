@@ -1,7 +1,8 @@
 import numpy as np
-from .abstract import AbstractLayer
+from .abstract import AbstractLayer, layer_registry
 
 
+@layer_registry.register('sigmoid')
 class Sigmoid(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)
@@ -14,6 +15,7 @@ class Sigmoid(AbstractLayer):
         return X * (1 - X) * d_out, None
 
 
+@layer_registry.register('ReLU')
 class ReLU(AbstractLayer):
     def _fwd_prop(self, X):
         out = np.maximum(X, 0)
@@ -25,6 +27,7 @@ class ReLU(AbstractLayer):
         return grad_in, None
 
 
+@layer_registry.register('tanh')
 class Tanh(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)
@@ -37,6 +40,7 @@ class Tanh(AbstractLayer):
         return (1 - X * X) * d_out, None
 
 
+@layer_registry.register('softmax')
 class Softmax(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)

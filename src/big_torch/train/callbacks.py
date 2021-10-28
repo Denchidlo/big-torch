@@ -1,11 +1,18 @@
+from ..preprocessing.cross_validation import metric_registry
+from ..core.utils import ModuleAggregator
+
+callback_registry = ModuleAggregator('callbacks')
+
+
 class TrainCallback:
     def call(self, learning_info):
         raise NotImplementedError()
 
 
+@callback_registry.register('epoch_info')
 class EpochInfo(TrainCallback):
-    def __init__(self, metric=None, validate=False, period=100) -> None:
-        self.metric = metric
+    def __init__(self, metric=None, validate=False, period=1) -> None:
+        self.metric = metric_registry[metric]
         self.validate = validate
         self.period = period
         self.init_meta = False
@@ -20,16 +27,18 @@ class EpochInfo(TrainCallback):
                 'period': self.period
             }
             self.init_meta = True
-        
-        if learning_info['epoch'] % self.period == 1:
+
+        if learning_info['epoch'] % self.period == 1 or self.period == 1:
             model = learning_info['model']
             epoch = learning_info['epoch']
             v_loss, v_metric = None, None
 
-            t_loss, t_metric = model.eval(learning_info['x_train'], learning_info['y_train'], self.metric)
+            t_loss, t_metric = model.eval(
+                learning_info['x_train'], learning_info['y_train'], self.metric)
 
             if self.validate:
-                v_loss, v_metric = model.eval(learning_info['x_val'], learning_info['y_val'], self.metric)
+                v_loss, v_metric = model.eval(
+                    learning_info['x_val'], learning_info['y_val'], self.metric)
 
             learning_info['epoch_info']['train_loss'].append(t_loss)
             learning_info['epoch_info']['train_metrics'].append(t_metric)
@@ -37,4 +46,5 @@ class EpochInfo(TrainCallback):
             learning_info['epoch_info']['val_metrics'].append(v_metric)
 
             if learning_info['verbose'] > 0:
-                print(f'Epoch {epoch}: [Train] loss={t_loss} | metric={t_metric} [Test] loss={v_loss} | metric={v_metric}')
+                print(
+                    f'Epoch {epoch}: [Train] loss={t_loss} | metric={t_metric} [Test] loss={v_loss} | metric={v_metric}')

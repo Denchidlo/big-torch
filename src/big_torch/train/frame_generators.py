@@ -1,6 +1,10 @@
+from ..core.utils import ModuleAggregator
 from typing import Any
 import numpy as np
 from numpy.random.mtrand import choice
+
+
+generator_regitry = ModuleAggregator('frame_generators')
 
 
 class FrameGenerator:
@@ -25,6 +29,7 @@ class FrameGenerator:
         raise NotImplementedError()
 
 
+@generator_regitry.register('basic')
 class BasicGenerator(FrameGenerator):
     def __init__(self, train_x, train_y) -> None:
         super().__init__(train_x, train_y)
@@ -33,6 +38,7 @@ class BasicGenerator(FrameGenerator):
         return self.train_x, self.train_y
 
 
+@generator_regitry.register('random_batch')
 class StochasticBatchGenerator(FrameGenerator):
     def __init__(self, train_x, train_y, batch_size) -> None:
         super().__init__(train_x, train_y)
@@ -41,11 +47,13 @@ class StochasticBatchGenerator(FrameGenerator):
         self.batch_size = batch_size
 
     def __next__(self):
-        choice = self.generator.choice(self.total, self.batch_size, replace=False)
+        choice = self.generator.choice(
+            self.total, self.batch_size, replace=False)
 
         return self.train_x[choice, :], self.train_y[choice, :]
 
 
+@generator_regitry.register('random_element')
 class RandomElementGenerator(FrameGenerator):
     def __init__(self, train_x, train_y) -> None:
         super().__init__(train_x, train_y)

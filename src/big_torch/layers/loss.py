@@ -1,5 +1,5 @@
 import numpy as np
-from .abstract import AbstractLayer
+from .abstract import AbstractLayer, layer_registry
 
 
 class CrossEntropy(AbstractLayer):

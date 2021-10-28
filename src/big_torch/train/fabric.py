@@ -1,24 +1,23 @@
 from ..core.utils import ModuleAggregator
 from ..models.model import open_pool_session, close_pool_session
-from .frame_generators import BasicGenerator
-
-opitmizer_registry = ModuleAggregator()
+from .optimizers import optimizator_reigstry
+from .frame_generators import BasicGenerator, generator_regitry
 
 
 class OptimizatonFabric:
     def __init__(
         self,
-        gen=BasicGenerator,
-        updater=None,
+        generator=BasicGenerator,
+        optimizer=None,
         generator_cfg={},
-        updater_cfg={},
+        optimizer_cfg={},
         callbacks=[],
     ) -> None:
         self.generator_cfg = generator_cfg
-        self.updater_cfg = updater_cfg
+        self.optimizer_cfg = optimizer_cfg
         self.callbacks = callbacks
-        self.gen = gen
-        self.updater = updater
+        self.generator = generator_regitry[generator]
+        self.optimizer = optimizator_reigstry[optimizer]
 
     def train(
         self,
@@ -38,8 +37,9 @@ class OptimizatonFabric:
         prev_l0 = None
 
         # TODO: Add aggregator
-        frame_generator = self.gen(x_train, y_train, **self.generator_cfg)
-        optimizer = self.updater(**self.updater_cfg)
+        frame_generator = self.generator(
+            x_train, y_train, **self.generator_cfg)
+        optimizer = self.optimizer(**self.optimizer_cfg)
 
         if n_jobs != 1:
             open_pool_session(n_jobs)

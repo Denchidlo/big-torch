@@ -1,5 +1,6 @@
 class ModuleAggregator:
-    def __init__(self) -> None:
+    def __init__(self, registry_name) -> None:
+        self.registry_name = registry_name
         self._registry = {}
 
     def __getitem__(self, key):

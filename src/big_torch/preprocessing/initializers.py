@@ -2,7 +2,7 @@ import numpy as np
 import math
 from ..core.utils import ModuleAggregator
 
-initializer_registry = ModuleAggregator()
+initializer_registry = ModuleAggregator('weights_initialiser')
 
 
 @initializer_registry.register(name="xavier_uniform")

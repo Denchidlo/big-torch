@@ -1,5 +1,10 @@
 import numpy as np
+from ..core.utils import ModuleAggregator
 
+scaler_registry = ModuleAggregator(registry_name='scalers')
+
+
+@scaler_registry.register('min-max')
 class MinMaxScaler:
     def __init__(self) -> None:
         self.min = None
@@ -10,7 +15,8 @@ class MinMaxScaler:
             self.min = x.min()
             self.max = x.max()
         else:
-            raise NotImplementedError("Scaler is currently does not support axis wise scaling")
+            raise NotImplementedError(
+                "Scaler is currently does not support axis wise scaling")
 
     def fit_transform(self, x, axis=None, dtype=np.float64):
         if axis is None:
@@ -20,9 +26,11 @@ class MinMaxScaler:
             x /= (self.max - self.min)
             return x
         else:
-            raise NotImplementedError("Scaler is currently does not support axis wise scaling")
+            raise NotImplementedError(
+                "Scaler is currently does not support axis wise scaling")
 
 
+@scaler_registry.register('standart')
 class StandartScaler:
     def __init__(self) -> None:
         self.std = None
@@ -33,7 +41,8 @@ class StandartScaler:
             self.std = x.std()
             self.mean = x.mean()
         else:
-            raise NotImplementedError("Scaler is currently does not support axis wise scaling")
+            raise NotImplementedError(
+                "Scaler is currently does not support axis wise scaling")
 
     def fit_transform(self, x, axis=None, dtype=np.float64):
         if axis is None:
@@ -43,4 +52,5 @@ class StandartScaler:
             x /= self.std
             return x
         else:
-            raise NotImplementedError("Scaler is currently does not support axis wise scaling")
+            raise NotImplementedError(
+                "Scaler is currently does not support axis wise scaling")

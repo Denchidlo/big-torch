@@ -1,8 +1,15 @@
+from ..core.utils import ModuleAggregator
+
+
+optimizator_reigstry = ModuleAggregator('optimizator_registry')
+
+
 class Optimizator:
     def fit_transform(self, model, x, y, n_jobs):
         raise NotImplementedError()
 
 
+@optimizator_reigstry.register('gradient_decent')
 class GradientDecent(Optimizator):
     def __init__(self, eta) -> None:
         self.eta = eta

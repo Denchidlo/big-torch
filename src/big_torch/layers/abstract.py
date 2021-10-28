@@ -1,6 +1,10 @@
 from abc import abstractmethod
 import numpy as np
 
+from ..core.utils import ModuleAggregator
+
+layer_registry = ModuleAggregator(registry_name='layers')
+
 
 class AbstractLayer:
     def __init__(self, shape) -> None:
