@@ -1,10 +1,10 @@
-name: Publish BigTorch
+name: BT Publish
 
 on: push
 
 jobs:
   build-n-publish:
-    name: Publish BigTorch
+    name: BT Publish
     runs-on: ubuntu-18.04
 
     steps:

@@ -1,7 +1,7 @@
 import setuptools
 import json
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("PyPi_README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 with open("version.json", "r", encoding="utf-8") as fh:
