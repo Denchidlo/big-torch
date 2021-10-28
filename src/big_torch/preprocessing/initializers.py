@@ -1,6 +1,6 @@
 import numpy as np
 import math
-from .utils import ModuleAggregator
+from ..core.utils import ModuleAggregator
 
 initializer_registry = ModuleAggregator()
 

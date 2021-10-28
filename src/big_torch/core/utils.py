@@ -3,7 +3,9 @@ class ModuleAggregator:
         self._registry = {}
 
     def __getitem__(self, key):
-        return self._registry[key]
+        if isinstance(key, str):
+            return self._registry[key]
+        return key
 
     def register(self, name=None):
         def wrapper(func):

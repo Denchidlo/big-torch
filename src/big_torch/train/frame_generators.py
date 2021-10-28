@@ -39,13 +39,11 @@ class StochasticBatchGenerator(FrameGenerator):
         self.generator = np.random.default_rng()
         self.total = train_x.shape[0]
         self.batch_size = batch_size
-        self.mask_builder = np.array([i for i in range(self.total)], dtype=np.int32)
 
     def __next__(self):
-        choice = self.generator.choice(self.total, self.batch_size)
-        mask = self.mask_builder in choice
+        choice = self.generator.choice(self.total, self.batch_size, replace=False)
 
-        return self.train_x[mask], self.train_y[mask]
+        return self.train_x[choice, :], self.train_y[choice, :]
 
 
 class RandomElementGenerator(FrameGenerator):

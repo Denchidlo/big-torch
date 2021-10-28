@@ -1,6 +1,6 @@
 from .abstract import ParametrizedLayer
 from ..core.warnings import restrict_parallel
-from ..core.initializers import initializer_registry
+from ..preprocessing.initializers import initializer_registry
 import numpy as np
 
 

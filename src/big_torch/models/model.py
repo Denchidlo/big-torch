@@ -118,3 +118,9 @@ class Model:
     def predict(self, X):
         worker = self._ModelInstance(self)
         return worker._forward(X)
+
+    def eval(self, x, y, metric=None):
+        y_hat = self._ModelInstance(self)._forward(x)
+        loss, _ = self.loss_function._fwd_prop((y_hat, y))
+        metrics = metric(y_hat, y) if metric != None else None
+        return loss, metrics

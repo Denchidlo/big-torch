@@ -6,6 +6,7 @@ __pycache__/
 # Manualy added
 *.ipynb
 !some.ipynb
+SECRETS
 # lib.py
 dist
 *.egg-info
@@ -13,8 +14,9 @@ dist
 # Temporary excluded
 data_mnist
 *.yml
-*.toml
-setup.py
+!publish-to-pypi.yml
+# *.toml
+# setup.py
 
 # C extensions
 *.so
