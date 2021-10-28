@@ -1,7 +1,7 @@
 from ..core.utils import ModuleAggregator
 from ..models.model import open_pool_session, close_pool_session
-from .optimizers import optimizator_reigstry
-from .frame_generators import BasicGenerator, generator_regitry
+from .optimizers import optimizator_registry
+from .frame_generators import BasicGenerator, generator_registry
 
 
 class OptimizatonFabric:
@@ -16,8 +16,8 @@ class OptimizatonFabric:
         self.generator_cfg = generator_cfg
         self.optimizer_cfg = optimizer_cfg
         self.callbacks = callbacks
-        self.generator = generator_regitry[generator]
-        self.optimizer = optimizator_reigstry[optimizer]
+        self.generator = generator_registry[generator]
+        self.optimizer = optimizator_registry[optimizer]
 
     def train(
         self,

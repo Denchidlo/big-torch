@@ -1,7 +1,7 @@
 from ..core.utils import ModuleAggregator
 
 
-optimizator_reigstry = ModuleAggregator('optimizator_registry')
+optimizator_registry = ModuleAggregator('optimizator_registry')
 
 
 class Optimizator:
@@ -9,7 +9,7 @@ class Optimizator:
         raise NotImplementedError()
 
 
-@optimizator_reigstry.register('gradient_decent')
+@optimizator_registry.register('gradient_decent')
 class GradientDecent(Optimizator):
     def __init__(self, eta) -> None:
         self.eta = eta
