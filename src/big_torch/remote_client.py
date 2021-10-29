@@ -82,6 +82,8 @@ class RemoteClient():
             **self.cfg['run_session']['train_kwargs']
         )
 
+        return model, train_info
+
     def run(self):
         self.preprocessing_stage()
         self.compile_model()

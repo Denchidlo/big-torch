@@ -1,0 +1,5 @@
+FROM bigtorch:test
+
+COPY config config
+
+CMD ["ipython", "runner.py"]

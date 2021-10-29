@@ -4,19 +4,15 @@ __pycache__/
 *$py.class
 
 # Manualy added
-*.ipynb
-!some.ipynb
+.neptune
 SECRETS
-# lib.py
 dist
 *.egg-info
+test
 
 # Temporary excluded
-data_mnist
 *.yml
 !publish-to-pypi.yml
-# *.toml
-# setup.py
 
 # C extensions
 *.so
