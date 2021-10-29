@@ -8,14 +8,16 @@ def to_pickle(obj, path):
     with open(path, 'wb') as writer:
         pickle.dump(obj, writer)
 
+
 def to_json(obj, path):
     with open(path, 'wb') as writer:
         json.dump(obj, writer)
 
+
 class NeptuneClient():
     def __init__(self, credentials) -> None:
         self.credentials = credentials
-        
+
     def process_experiment(self, model_cfg):
         with open(model_cfg, 'r+') as reader:
             cfg = json.load(reader)
@@ -28,8 +30,10 @@ class NeptuneClient():
         print('Model was succesfully finished')
 
         run = neptune.init(
-            run=cfg['neptune_meta']['run'] if cfg['neptune_meta'].get('run', None) != None else None,
-            tags=cfg['neptune_meta']['tags'] if cfg['neptune_meta'].get('tags', None) != None else None,
+            run=cfg['neptune_meta']['run'] if cfg['neptune_meta'].get(
+                'run', None) != None else None,
+            tags=cfg['neptune_meta']['tags'] if cfg['neptune_meta'].get(
+                'tags', None) != None else None,
             **self.credentials
         )
         print('Initialize neptune session')
@@ -44,7 +48,6 @@ class NeptuneClient():
         run['model/optimizer/config'] = cfg['run_session']['fabric']['optimizer_cfg']
 
         run['session/args'] = cfg['run_session']['train_kwargs']
-        
 
         del learning_info['model']
         del learning_info['x_val']
@@ -71,17 +74,14 @@ class NeptuneClient():
 
         for metric, neptune_key in mapper.items():
             series = epoch_info[metric]
-            
+
             for idx in range(epochs_total):
                 run[neptune_key].log(series[idx], step=(idx*period + 1))
 
         run['dump/experiment/config'].upload_files(model_cfg)
-        
+
         to_pickle(model, './model_dump.pkl')
         run['dump/model'].upload_files('./model_dump.pkl')
 
         print('Neptune session finished')
         run.stop()
-
-
-        
