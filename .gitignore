@@ -5,6 +5,7 @@ __pycache__/
 
 # Manualy added
 .neptune
+cedentials.json
 SECRETS
 dist
 *.egg-info
