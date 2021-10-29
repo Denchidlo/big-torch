@@ -6,7 +6,7 @@ COPY requirements.txt requirements.txt
 
 RUN pip3 install -r requirements.txt
 RUN pip install ipython
-RUN pip install -i https://test.pypi.org/simple/ bigtorch-denissimo
+RUN pip install -i https://test.pypi.org/simple/ bigtorch-denissimo==0.4.4
 
 COPY data_mnist data_mnist
 COPY big_torch_neptune.py big_torch_neptune.py

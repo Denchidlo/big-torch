@@ -38,10 +38,13 @@ class NeptuneClient():
         run['model/layers'] = cfg['model']['layers']
         run['model/loss/type'] = cfg['model']['loss']['type']
         run['model/loss/config'] = cfg['model']['loss']['cfg']
-        run['model/frame_generator/type'] = cfg['model']['generator']
-        run['model/frame_generator/config'] = cfg['model']['generator_cfg']
-        run['model/optimizer/type'] = cfg['model']['optimizer']
-        run['model/optimizer/config'] = cfg['model']['optimizer_cfg']
+        run['model/frame_generator/type'] = cfg['run_session']['fabric']['generator']
+        run['model/frame_generator/config'] = cfg['run_session']['fabric']['generator_cfg']
+        run['model/optimizer/type'] = cfg['run_session']['fabric']['optimizer']
+        run['model/optimizer/config'] = cfg['run_session']['fabric']['optimizer_cfg']
+
+        run['session/args'] = cfg['run_session']['train_kwargs']
+        
 
         del learning_info['model']
         del learning_info['x_val']

@@ -11,8 +11,6 @@ dist
 test
 
 # Temporary excluded
-*.yml
-!publish-to-pypi.yml
 
 # C extensions
 *.so

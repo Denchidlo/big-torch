@@ -1,4 +1,4 @@
-FROM bigtorch:test
+FROM den1ss1mo/big-torch:latest
 
 COPY config config
 
