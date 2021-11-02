@@ -9,7 +9,6 @@ class LinearLayer(ParametrizedLayer):
     def __init__(self, shape, w_init="xavier_normal", b_initial=0):
         self.shape = shape
 
-        # TODO: Make initalization more flexible
         self.W = initializer_registry[w_init](shape)
         self.b = b_initial * np.ones((1, shape[1]))
 
@@ -26,8 +25,20 @@ class LinearLayer(ParametrizedLayer):
     def change(self, step, eta):
         self.W -= eta * step[0]
         self.b -= eta * step[1]
+        return self
+
+    def blank(self):
+        return LinearLayer(self.shape, w_init='blank', b_initial=0)
+
+    def get_context(self):
+        return self.W, self.b
 
     def average(self, gradients_list):
         w_list = [el[0] for el in gradients_list]
         b_list = [el[1] for el in gradients_list]
         return np.mean(w_list, axis=0), np.mean(b_list, axis=0)
+
+    def self_mul(self, multiplier):
+        self.W *= multiplier
+        self.b *= multiplier
+        return self

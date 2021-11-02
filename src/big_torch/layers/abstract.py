@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from abc import ABCMeta
 import numpy as np
 
 from ..core.utils import ModuleAggregator
@@ -22,6 +23,14 @@ class AbstractLayer:
 class ParametrizedLayer(AbstractLayer):
     def __init__(self, shape) -> None:
         super().__init__(shape)
+
+    @abstractmethod
+    def blank(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_context(self):
+        raise NotImplementedError()
 
     @abstractmethod
     def change(self, step, eta):

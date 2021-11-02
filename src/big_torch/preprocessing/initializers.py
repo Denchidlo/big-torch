@@ -1,9 +1,14 @@
+from os import name
 import numpy as np
 import math
 from ..core.utils import ModuleAggregator
 
 initializer_registry = ModuleAggregator('weights_initialiser')
 
+
+@initializer_registry.register(name='blank')
+def blank_initializer(shape):
+    return np.zeros(shape)
 
 @initializer_registry.register(name="xavier_uniform")
 def uniform_xavier_initializer(shape):

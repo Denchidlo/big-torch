@@ -48,6 +48,7 @@ class OptimizatonFabric:
             'y_val': y_val,
             'model': model,
             'verbose': verbose,
+            'callbacks': self.callbacks
         }
 
         for x_frame, y_frame in frame_generator:

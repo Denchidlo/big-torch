@@ -63,12 +63,13 @@
     "run_session": {
         "fabric": {
             "generator": "random_batch",
-            "optimizer": "gradient_decent",
+            "optimizer": "nesterov",
             "generator_cfg": {
                 "batch_size": 1000
             },
             "optimizer_cfg": {
-                "eta": 0.1
+                "eta": 0.1,
+                "gamma": 0.3
             },
             "callbacks": [
                 {
@@ -82,7 +83,7 @@
         },
         "train_kwargs": {
             "min_eps": 0.000005,
-            "max_iter": 30,
+            "max_iter": 100,
             "verbose": 1
         }
     }

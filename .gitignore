@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # Manualy added
+try_run.py
 .neptune
 credentials.json
 SECRETS
