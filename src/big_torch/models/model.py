@@ -61,7 +61,7 @@ class Model:
         def __init__(self, layers) -> None:
             self.layers = layers
 
-        def transform(self, gradients, eta):
+        def transform(self, gradients, eta, ):
             for idx, layer in enumerate(reversed(self.layers)):
                 layer.change(gradients[idx], eta)
 
