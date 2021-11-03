@@ -42,3 +42,20 @@ class LinearLayer(ParametrizedLayer):
         self.W *= multiplier
         self.b *= multiplier
         return self
+
+    def apply(self, func, context=None):
+        c_W, c_b = None, None if context is None else context
+        self.W = func(self.W, c_W)
+        self.b = func(self.b, c_b)
+        return self
+
+    @staticmethod
+    def context_binary_operation(lhs, rhs, operation):
+        w_res = operation(lhs[0], rhs[0])
+        b_res = operation(lhs[1], rhs[1])
+        return w_res, b_res
+
+@layer_registry.register('conv-2d')
+class Conv2D(ParametrizedLayer):
+    def __init__(self, shape) -> None:
+        super().__init__(shape)

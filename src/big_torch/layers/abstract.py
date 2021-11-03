@@ -39,3 +39,12 @@ class ParametrizedLayer(AbstractLayer):
     @abstractmethod
     def average(self, gradients_list):
         raise NotImplementedError()
+
+    @abstractmethod
+    def apply(self, func):
+        raise NotImplementedError()
+
+    @abstractmethod
+    @staticmethod
+    def binary_operation(lhs, rhs, operation):
+        raise NotImplementedError()
