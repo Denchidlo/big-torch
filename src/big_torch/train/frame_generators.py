@@ -1,4 +1,4 @@
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 from typing import Any
 import numpy as np
 from numpy.random.mtrand import choice

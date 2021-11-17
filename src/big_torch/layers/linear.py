@@ -1,21 +1,25 @@
-from .abstract import AbstractLayer, layer_registry, ParametrizedLayer
-from ..core.warnings import restrict_parallel
-from ..preprocessing.initializers import initializer_registry
 import numpy as np
+
+from ..utils.warnings import restrict_parallel
+from ..preprocessing.initializers import initializer_registry
+from .abstract import AbstractLayer, layer_registry, ParametrizedLayer
+from .layer_mixins import DependecyCallMixin
 
 
 @layer_registry.register('linear')
-class LinearLayer(ParametrizedLayer):
-    def __init__(self, shape, w_init="xavier_normal", b_initial=0):
+class LinearLayer(ParametrizedLayer, DependecyCallMixin):
+    output_names = ['y']
+
+    def __init__(self, shape, kernel_initializer="xavier_normal", b_initial=0):
         self.shape = shape
 
-        self.W = initializer_registry[w_init](shape)
+        self.W = initializer_registry[kernel_initializer](shape)
         self.b = b_initial * np.ones((1, shape[1]))
 
-    def _fwd_prop(self, X):
+    def _fwd_pass(self, X):
         return X.dot(self.W) + self.b, X
 
-    def _bckwd_prop(self, X, d_out):
+    def _bwd_pass(self, X, d_out):
         grad_W = X.T.dot(d_out)
         grad_b = np.mean(d_out, axis=0)
         grad_in = d_out.dot(self.W.T)
@@ -28,7 +32,7 @@ class LinearLayer(ParametrizedLayer):
         return self
 
     def blank(self):
-        return LinearLayer(self.shape, w_init='blank', b_initial=0)
+        return LinearLayer(self.shape, kernel_initializer='blank', b_initial=0)
 
     def get_context(self):
         return self.W, self.b
@@ -37,11 +41,6 @@ class LinearLayer(ParametrizedLayer):
         w_list = [el[0] for el in gradients_list]
         b_list = [el[1] for el in gradients_list]
         return np.mean(w_list, axis=0), np.mean(b_list, axis=0)
-
-    def self_mul(self, multiplier):
-        self.W *= multiplier
-        self.b *= multiplier
-        return self
 
     def apply(self, func, context=None):
         c_W, c_b = None, None if context is None else context
@@ -54,8 +53,3 @@ class LinearLayer(ParametrizedLayer):
         w_res = operation(lhs[0], rhs[0])
         b_res = operation(lhs[1], rhs[1])
         return w_res, b_res
-
-@layer_registry.register('conv-2d')
-class Conv2D(ParametrizedLayer):
-    def __init__(self, shape) -> None:
-        super().__init__(shape)

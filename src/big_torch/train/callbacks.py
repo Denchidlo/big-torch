@@ -1,5 +1,5 @@
 from ..preprocessing.cross_validation import metric_registry
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 
 callback_registry = ModuleAggregator('callbacks')
 
@@ -11,19 +11,20 @@ class TrainCallback:
 
 @callback_registry.register('epoch_info')
 class EpochInfo(TrainCallback):
-    def __init__(self, metric=None, validate=False, period=1) -> None:
-        self.metric = metric_registry[metric]
-        self.validate = validate
+    def __init__(self, metrics={}, validate=False, period=1) -> None:
+        self.metric_names = metrics.keys()
+        self.metrics = [metric_registry[metric] for metric in metrics.values()]
         self.period = period
+        self.validate = validate
         self.init_meta = False
 
     def call(self, learning_info):
         if self.init_meta == False:
             learning_info['epoch_info'] = {
                 'train_loss': [],
-                'train_metrics': [],
+                'train_metrics': {name: [] for name in self.metric_names},
                 'val_loss': [],
-                'val_metrics': [],
+                'val_metrics': {name: [] for name in self.metric_names},
                 'period': self.period
             }
             self.init_meta = True
@@ -34,16 +35,18 @@ class EpochInfo(TrainCallback):
             v_loss, v_metric = None, None
 
             t_loss, t_metric = model.eval(
-                learning_info['x_train'], learning_info['y_train'], self.metric)
+                learning_info['x_train'], learning_info['y_train'], self.metrics)
 
             if self.validate:
                 v_loss, v_metric = model.eval(
-                    learning_info['x_val'], learning_info['y_val'], self.metric)
+                    learning_info['x_val'], learning_info['y_val'], self.metrics)
 
             learning_info['epoch_info']['train_loss'].append(t_loss)
-            learning_info['epoch_info']['train_metrics'].append(t_metric)
             learning_info['epoch_info']['val_loss'].append(v_loss)
-            learning_info['epoch_info']['val_metrics'].append(v_metric)
+
+            for idx, name in enumerate(self.metric_names):
+                learning_info['epoch_info']['train_metrics'][name].append(t_metric[idx])
+                learning_info['epoch_info']['val_metrics'][name].append(v_metric[idx])
 
             if learning_info['verbose'] > 0:
                 print(

@@ -15,7 +15,7 @@
                 "cfg": {
                     "shape": [784, 100],
                     "b_initial": 1,
-                    "w_init": "xavier_normal"
+                    "kernel_initializer": "xavier_normal"
                 }
             },
             {
@@ -29,7 +29,7 @@
                 "cfg": {
                     "shape": [100, 100],
                     "b_initial": 1,
-                    "w_init": "xavier_normal"
+                    "kernel_initializer": "xavier_normal"
                 }
             },
             {
@@ -43,7 +43,7 @@
                 "cfg": {
                     "shape": [100, 10],
                     "b_initial": 1,
-                    "w_init": "xavier_normal"
+                    "kernel_initializer": "xavier_normal"
                 }
             },
             {
@@ -76,7 +76,9 @@
                     "type": "epoch_info",
                     "cfg": {
                         "validate": true,
-                        "metric": "accuracy"
+                        "metrics": {
+                            "accuracy": "accuracy"
+                        }
                     }
                 }
             ]

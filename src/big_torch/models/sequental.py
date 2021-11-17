@@ -1,22 +1,12 @@
-from ..layers.abstract import ParametrizedLayer
-import multiprocessing as mp
 import numpy as np
 
-POOL = None
+from ..layers.abstract import ParametrizedLayer
+from .shared import BasicModelParams, open_pool_session, close_pool_session, POOL
 
 
-def open_pool_session(n_jobs):
-    global POOL
-    POOL = mp.Pool(n_jobs).__enter__()
+class Sequental:
+    _ModelParams = BasicModelParams
 
-
-def close_pool_session():
-    global POOL
-    POOL.__exit__(None, None, None)
-    POOL = None
-
-
-class Model:
     class _ModelInstance:
         def __init__(self, fabric):
             self.common = fabric
@@ -26,7 +16,7 @@ class Model:
         def _forward(self, X):
             self.bprop_context = []
             for layer in self.common.layers:
-                X, bprop = layer._fwd_prop(X)
+                X, bprop = layer._fwd_pass(X)
                 self.bprop_context.append(bprop)
 
             self.last_predict = X
@@ -35,14 +25,14 @@ class Model:
         def _back_propogate(self, y):
             # Loss function gradient init
             # Note that it's the only place were we call loss function
-            loss, predict = self.common.loss_function._fwd_prop(
+            loss, predict = self.common.loss_function._fwd_pass(
                 (self.last_predict, y))
-            d_out, _ = self.common.loss_function._bckwd_prop(predict, y)
+            d_out, _ = self.common.loss_function._bwd_pass(predict, y)
 
             idx = len(self.common.layers)
             for layer in reversed(self.common.layers):
                 idx -= 1
-                d_out, grad = layer._bckwd_prop(self.bprop_context[idx], d_out)
+                d_out, grad = layer._bwd_pass(self.bprop_context[idx], d_out)
 
                 if not grad is None:
                     self.gradient_context.append(grad)
@@ -57,23 +47,6 @@ class Model:
 
             return loss, gradient_context
 
-    class _ModelParams:
-        def __init__(self, layers) -> None:
-            self.layers = layers
-
-        def transform(self, gradients, eta, ):
-            for idx, layer in enumerate(reversed(self.layers)):
-                layer.change(gradients[idx], eta)
-
-        def _avg_grads(self, gradients_list):
-            resulting = []
-
-            for idx, layer in enumerate(reversed(self.layers)):
-                resulting.append(layer.average(
-                    [el[idx] for el in gradients_list]))
-
-            return resulting
-
     def __init__(self) -> None:
         self.layers = []
         self.loss_function = None
@@ -84,7 +57,7 @@ class Model:
     def set_loss(self, loss):
         self.loss_function = loss
 
-    def build(self):
+    def compile(self):
         self._parametrised_layers = [
             layer for layer in self.layers if isinstance(layer, ParametrizedLayer)
         ]
@@ -121,8 +94,8 @@ class Model:
         worker = self._ModelInstance(self)
         return worker._forward(X)
 
-    def eval(self, x, y, metric=None):
+    def eval(self, x, y, metrics=None):
         y_hat = self._ModelInstance(self)._forward(x)
-        loss, _ = self.loss_function._fwd_prop((y_hat, y))
-        metrics = metric(y_hat, y) if metric != None else None
+        loss, _ = self.loss_function._fwd_pass((y_hat, y))
+        metrics = [metric(y_hat, y) for metric in metrics] if len(metrics) != 0 else []
         return loss, metrics

@@ -1,4 +1,4 @@
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 import numpy as np
 
 
@@ -31,18 +31,20 @@ class ClassicMomentum(Optimizator):
 
     def fit_transform(self, model, x, y, learn_info, n_jobs=1):
         if self._momentum is None:
-            self._momentum = [layer.blank() for layer in reversed(model.params.layers)]
+            self._momentum = [layer.blank()
+                              for layer in reversed(model.params.layers)]
         l0, l1 = model.ask_oracle(x, y, n_jobs=n_jobs)
         learn_info["l0"] = l0
         self._momentum = [
-            layer.self_mul(self.gamma).change(step_grad, -1 * self.eta) 
+            layer.apply(lambda x, _: x *
+                        self.gamma).change(step_grad, -1 * self.eta)
             for layer, step_grad in zip(self._momentum, l1)
         ]
         model.params.transform(
             [layer.get_context() for layer in self._momentum],
             1
         )
-         
+
 
 @optimizator_registry.register('nesterov')
 class NesterovMomentum(Optimizator):
@@ -53,7 +55,8 @@ class NesterovMomentum(Optimizator):
 
     def fit_transform(self, model, x, y, learn_info, n_jobs=1):
         if self._momentum is None:
-            self._momentum = [layer.blank() for layer in reversed(model.params.layers)]
+            self._momentum = [layer.blank()
+                              for layer in reversed(model.params.layers)]
         model.params.transform(
             [layer.get_context() for layer in self._momentum],
             1
@@ -61,7 +64,8 @@ class NesterovMomentum(Optimizator):
         l0, l1 = model.ask_oracle(x, y, n_jobs=n_jobs)
         learn_info["l0"] = l0
         self._momentum = [
-            layer.self_mul(self.gamma).change(step_grad, -1 * self.eta) 
+            layer.apply(lambda x, _: x *
+                        self.gamma).change(step_grad, -1 * self.eta)
             for layer, step_grad in zip(self._momentum, l1)
         ]
 
@@ -75,24 +79,25 @@ class Adagrad(Optimizator):
 
     def fit_transform(self, model, x, y, learn_info, n_jobs=1):
         if self._cumulative_grad is None:
-            self._cumulative_grad = [layer.blank() for layer in reversed(model.params.layers)]
-        
+            self._cumulative_grad = [layer.blank()
+                                     for layer in reversed(model.params.layers)]
+
         l0, l1 = model.ask_oracle(x, y, n_jobs=n_jobs)
         grads = []
 
         for grad_context, layer in zip(l1, self._cumulative_grad):
             grads.append(layer.context_binary_operation(
-                grad_context, 
-                layer.get_context(), 
-                lambda lhs, rhs: (lhs / (np.sqrt(rhs) + self.eps))    
+                grad_context,
+                layer.get_context(),
+                lambda lhs, rhs: (lhs / (np.sqrt(rhs) + self.eps))
             ))
-        
+
         for grad_context, layer in zip(l1, self._cumulative_grad):
-            layer.apply(lambda x, context: x + context**2, grad_context) 
+            layer.apply(lambda x, context: x + context**2, grad_context)
 
         model.params.transform(grads, self.eta)
 
-        learn_info["l0"] = l0        
+        learn_info["l0"] = l0
 
 
 @optimizator_registry.register('Adadelta')
@@ -105,9 +110,11 @@ class Adadelta(Optimizator):
 
     def fit_transform(self, model, x, y, learn_info, n_jobs=1):
         if self._cumulative_grad is None:
-            self._cumulative_grad = [layer.blank() for layer in reversed(model.params.layers)]
-            self._delta_grad = [layer.blank() for layer in reversed(model.params.layers)]
-        
+            self._cumulative_grad = [layer.blank()
+                                     for layer in reversed(model.params.layers)]
+            self._delta_grad = [layer.blank()
+                                for layer in reversed(model.params.layers)]
+
         l0, l1 = model.ask_oracle(x, y, n_jobs=n_jobs)
         grads = []
 
@@ -117,15 +124,17 @@ class Adadelta(Optimizator):
                     delta_layer.get_context(),
                     grad_context,
                     lambda lhs, rhs: np.sqrt(lhs + self.eps) * rhs
-                ), 
-                cumulative_layer.get_context(), 
-                lambda lhs, rhs: (lhs / (np.sqrt(rhs) + self.eps))    
+                ),
+                cumulative_layer.get_context(),
+                lambda lhs, rhs: (lhs / (np.sqrt(rhs) + self.eps))
             ))
-        
+
         for grad_context, cumulative_layer, delta_layer, delta_grads in zip(l1, self._cumulative_grad, self._delta_grad, grads):
-            delta_layer.apply(lambda x, context: (self.damp * x) + (1 - self.damp) * (context ** 2), delta_grads)
-            cumulative_layer.apply(lambda x, context: (self.damp * x) + (1 - self.damp) * (context ** 2), grad_context) 
+            delta_layer.apply(lambda x, context: (
+                self.damp * x) + (1 - self.damp) * (context ** 2), delta_grads)
+            cumulative_layer.apply(lambda x, context: (
+                self.damp * x) + (1 - self.damp) * (context ** 2), grad_context)
 
         model.params.transform(grads, self.eta)
 
-        learn_info["l0"] = l0  
+        learn_info["l0"] = l0

@@ -1,8 +1,7 @@
 from abc import abstractmethod
-from abc import ABCMeta
 import numpy as np
 
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 
 layer_registry = ModuleAggregator(registry_name='layers')
 
@@ -12,11 +11,11 @@ class AbstractLayer:
         self.shape = shape
 
     @abstractmethod
-    def _fwd_prop(self, X):
+    def _fwd_pass(self, X):
         raise NotImplementedError()
 
     @abstractmethod
-    def _bckwd_prop(self, X, d_out):
+    def _bwd_pass(self, X, d_out):
         raise NotImplementedError()
 
 
@@ -45,6 +44,5 @@ class ParametrizedLayer(AbstractLayer):
         raise NotImplementedError()
 
     @abstractmethod
-    @staticmethod
     def binary_operation(lhs, rhs, operation):
         raise NotImplementedError()

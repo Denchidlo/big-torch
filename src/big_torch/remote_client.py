@@ -4,14 +4,19 @@ from .train.callbacks import callback_registry
 from .preprocessing.scalers import scaler_registry
 from .layers.abstract import layer_registry
 
-from .train import OptimizatonFabric
-from .models import Model
+from .train.fabric import OptimizatonFabric
+from .models.sequental import Sequental
 
 import numpy as np
 import json
 
 
 class RemoteClient():
+    """
+        RemoteClient: allow you to jsonify your model structure
+
+        Remote configuration is currently available ONLY for Sequental model
+    """
     def __init__(self, cfg_file) -> None:
         with open(cfg_file, 'r+') as reader:
             self.cfg = json.load(reader)
@@ -42,7 +47,7 @@ class RemoteClient():
     def compile_model(self):
         model_cfg = self.cfg['model']
 
-        net = Model()
+        net = Sequental()
         self._context['net'] = net
 
         for layer in model_cfg['layers']:
@@ -51,7 +56,7 @@ class RemoteClient():
         loss_layer = model_cfg['loss']
         net.set_loss(layer_registry[loss_layer['type']](**loss_layer['cfg']))
 
-        net.build()
+        net.compile()
 
     def instantiate_callback(self, callback_cfg):
         callback = callback_registry[callback_cfg['type']](

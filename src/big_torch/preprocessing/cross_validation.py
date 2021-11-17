@@ -1,5 +1,5 @@
 import numpy as np
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 
 metric_registry = ModuleAggregator('metrics')
 
@@ -27,5 +27,5 @@ def train_test_split(a, b, test_size):
 
 @metric_registry.register('accuracy')
 def class_accuracy(y_true, y_pred):
-    # both are not one hot encoded
+    # both are one hot encoded
     return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))

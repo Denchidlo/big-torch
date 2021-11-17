@@ -22,7 +22,7 @@ class NeptuneClient():
         with open(model_cfg, 'r+') as reader:
             cfg = json.load(reader)
 
-        print('Model is started')
+        print('Model has started')
 
         client = RemoteClient(model_cfg)
         model, learning_info = client.run()
@@ -61,8 +61,8 @@ class NeptuneClient():
         mapper = {
             'train_loss': 'metrics/train/loss',
             'val_loss': 'metrics/test/loss',
-            'train_metrics': 'metrics/train/accuracy',
-            'val_metrics': 'metrics/test/accuracy',
+            'train_metrics': 'metrics/train',
+            'val_metrics': 'metrics/test',
         }
 
         valid_metrics = []

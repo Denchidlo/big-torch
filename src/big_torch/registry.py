@@ -1,4 +1,4 @@
-from big_torch.core.utils import ModuleAggregator
+from big_torch.utils.registry import ModuleAggregator
 
 # Registry organazing
 from .layers.abstract import layer_registry

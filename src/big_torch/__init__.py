@@ -1,6 +1,6 @@
 from . import models
 from . import layers
-from . import core
+from . import utils
 from . import preprocessing
 from . import train
 from . import remote_client

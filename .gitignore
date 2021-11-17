@@ -11,6 +11,9 @@ SECRETS
 dist
 *.egg-info
 test
+push_to_env.sh
+run.ipynb
+recurrent.py
 
 # Temporary excluded
 

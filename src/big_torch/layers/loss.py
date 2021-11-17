@@ -1,13 +1,22 @@
 import numpy as np
+
+from ..utils.warnings import warn_on_create
 from .abstract import AbstractLayer, layer_registry
+from .layer_mixins import DependecyCallMixin
 
 
+@warn_on_create(
+    msg='\'CrossEntropy\' loss works only with \'softmax\' activation layer. Do not even try to use it separately',
+    warning_type=RuntimeWarning
+)
 @layer_registry.register('multinomial_cross_entropy')
-class CrossEntropy(AbstractLayer):
+class CrossEntropy(AbstractLayer, DependecyCallMixin):
+    output_names = ['y']
+
     def __init__(self, shape, softmax_prev=False) -> None:
         super().__init__(shape)
 
-    def _fwd_prop(self, result_tuple):
+    def _fwd_pass(self, result_tuple):
         """
         Warning: Do not call it implicitly
 
@@ -22,7 +31,7 @@ class CrossEntropy(AbstractLayer):
 
         return np.sum(losses) / y.shape[0], y_hat
 
-    def _bckwd_prop(self, X, d_out):
+    def _bwd_pass(self, X, d_out):
         """
         Warning: Do not call it implicitly
 

@@ -1,5 +1,5 @@
 import numpy as np
-from ..core.utils import ModuleAggregator
+from ..utils.registry import ModuleAggregator
 
 scaler_registry = ModuleAggregator(registry_name='scalers')
 
