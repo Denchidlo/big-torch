@@ -187,7 +187,7 @@ class ComputationalGraph(ComputationalComponent):
             self._store_execution_context(
                 'gradient_context', [component.id], [component_context])
 
-        return self._fetch_execution_context('inputs', self.outputs)
+        return self._fetch_execution_context('inputs', self.outputs), self._execution_context['gradient_context']
 
     def _bwd_pass(self, d_out):
 
@@ -218,4 +218,4 @@ class ComputationalGraph(ComputationalComponent):
             if isinstance(component.get_layers()[0], ParametrizedLayer):
                 self._execution_context['param_grad'].append(param_grads)
 
-        return self._execution_context['param_grad']
+        return self._fetch_execution_context('gradients', self.dependencies), self._execution_context['param_grad']

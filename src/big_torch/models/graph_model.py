@@ -19,7 +19,7 @@ class GraphModel:
         def _forward(self, X):
             graph = self.computational_graph
             graph.clear_execution_context()
-            result = graph._fwd_pass(X if len(graph.input_components) > 1 else [X])
+            result, _ = graph._fwd_pass(X if len(graph.input_components) > 1 else [X])
             return result if len(graph.outputs) > 1 else result[0]
 
         def _back_propogate(self, y):
@@ -39,15 +39,16 @@ class GraphModel:
                 return l0_vals, l1_vals
 
             l0_vals, l1_vals = _calculate_loss()
-            graph._bwd_pass(l1_vals)
+            _, param_grads = graph._bwd_pass(l1_vals)
 
-            return l0_vals[0], graph._execution_context['param_grad']
+            return l0_vals[0], param_grads
 
         @staticmethod
         def train_step(args):
             self, x, y = args
             self._forward(x)
             loss, gradient_context = self._back_propogate(y)
+            self.clear_execution_context()
 
             return loss, gradient_context
 
