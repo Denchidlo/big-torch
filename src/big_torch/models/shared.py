@@ -26,7 +26,6 @@ class BasicModelParams:
         resulting = []
 
         for idx, layer in enumerate(reversed(self.layers)):
-            resulting.append(layer.average(
-                [el[idx] for el in gradients_list]))
+            resulting.append(layer.average([el[idx] for el in gradients_list]))
 
         return resulting

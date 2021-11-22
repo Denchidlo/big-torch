@@ -36,19 +36,18 @@ class OptimizatonFabric:
         prev_l0 = None
 
         # TODO: Add aggregator
-        frame_generator = self.generator(
-            x_train, y_train, **self.generator_cfg)
+        frame_generator = self.generator(x_train, y_train, **self.generator_cfg)
         optimizer = self.optimizer(**self.optimizer_cfg)
 
         if n_jobs != 1:
             open_pool_session(n_jobs)
 
         learning_information = {
-            'x_val': x_val,
-            'y_val': y_val,
-            'model': model,
-            'verbose': verbose,
-            'callbacks': self.callbacks
+            "x_val": x_val,
+            "y_val": y_val,
+            "model": model,
+            "verbose": verbose,
+            "callbacks": self.callbacks,
         }
 
         for x_frame, y_frame in frame_generator:
@@ -58,10 +57,10 @@ class OptimizatonFabric:
                 model, x_frame, y_frame, learning_information, n_jobs
             )
 
-            learning_information['epoch'] = epoch
-            learning_information['x_train'] = x_frame
-            learning_information['y_train'] = y_frame
-            l0 = learning_information['l0']
+            learning_information["epoch"] = epoch
+            learning_information["x_train"] = x_frame
+            learning_information["y_train"] = y_frame
+            l0 = learning_information["l0"]
 
             for callback in self.callbacks:
                 callback.call(learning_information)

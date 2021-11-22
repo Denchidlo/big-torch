@@ -1,14 +1,15 @@
 import numpy as np
 
-from ..utils.warnings import restrict_parallel
 from ..preprocessing.initializers import initializer_registry
-from .abstract import AbstractLayer, layer_registry, ParametrizedLayer
-from .layer_mixins import DependecyCallMixin
+from .abstract import AbstractLayer, layer_registry, ParametrizedObject
+from .layer_mixins import DependecyCallMixin, GradientStacker1DMixin
 
 
-@layer_registry.register('linear')
-class LinearLayer(ParametrizedLayer, DependecyCallMixin):
-    output_names = ['y']
+@layer_registry.register("linear")
+class Dense(
+    AbstractLayer, ParametrizedObject, DependecyCallMixin, GradientStacker1DMixin
+):
+    output_names = ["y"]
 
     def __init__(self, shape, kernel_initializer="xavier_normal", b_initial=0):
         self.shape = shape
@@ -32,7 +33,7 @@ class LinearLayer(ParametrizedLayer, DependecyCallMixin):
         return self
 
     def blank(self):
-        return LinearLayer(self.shape, kernel_initializer='blank', b_initial=0)
+        return Dense(self.shape, kernel_initializer="blank", b_initial=0)
 
     def get_context(self):
         return self.W, self.b
@@ -48,8 +49,7 @@ class LinearLayer(ParametrizedLayer, DependecyCallMixin):
         self.b = func(self.b, c_b)
         return self
 
-    @staticmethod
-    def context_binary_operation(lhs, rhs, operation):
+    def context_binary_operation(self, lhs, rhs, operation):
         w_res = operation(lhs[0], rhs[0])
         b_res = operation(lhs[1], rhs[1])
         return w_res, b_res

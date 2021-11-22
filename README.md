@@ -48,11 +48,11 @@ from big_torch import models, train, layers, preprocessing
 
 net = models.sequental.Sequental()
 
-net.add_layer(layers.linear.LinearLayer((784, 100), b_initial=0, kernel_initializer='xavier_normal'))
+net.add_layer(layers.linear.Dense((784, 100), b_initial=0, kernel_initializer='xavier_normal'))
 net.add_layer(layers.activations.Tanh((100, 100)))
-net.add_layer(layers.linear.LinearLayer((100, 100) , b_initial=0, kernel_initializer='xavier_normal'))
+net.add_layer(layers.linear.Dense((100, 100) , b_initial=0, kernel_initializer='xavier_normal'))
 net.add_layer(layers.activations.Tanh((100, 100)))
-net.add_layer(layers.linear.LinearLayer((100, 10) , b_initial=0, kernel_initializer='xavier_normal'))
+net.add_layer(layers.linear.Dense((100, 10) , b_initial=0, kernel_initializer='xavier_normal'))
 net.add_layer(layers.activations.Softmax((10, 10)))
 net.set_loss(layers.loss.CrossEntropy((10, 1)))
 net.compile()
@@ -81,11 +81,11 @@ from big_torch import models, train, layers, preprocessing
 
 input = layers.variables.Placeholder(shape=(784))()
 
-l1 = layers.linear.LinearLayer((784, 100), b_initial=0, kernel_initializer='xavier_normal')(input)
+l1 = layers.linear.Dense((784, 100), b_initial=0, kernel_initializer='xavier_normal')(input)
 a1 = layers.activations.Tanh((100, 100))(l1)
-l2 = layers.linear.LinearLayer((100, 100) , b_initial=0, kernel_initializer='xavier_normal')(a1)
+l2 = layers.linear.Dense((100, 100) , b_initial=0, kernel_initializer='xavier_normal')(a1)
 a2 = layers.activations.Tanh((100, 100))(l2)
-l3 = layers.linear.LinearLayer((100, 10) , b_initial=0, kernel_initializer='xavier_normal')(a2)
+l3 = layers.linear.Dense((100, 10) , b_initial=0, kernel_initializer='xavier_normal')(a2)
 
 o1 = layers.activations.Softmax((10, 10))(l3)
 loss = layers.loss.CrossEntropy((10,1))(o1)

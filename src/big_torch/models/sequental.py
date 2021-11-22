@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..layers.abstract import ParametrizedLayer
+from ..layers.abstract import ParametrizedObject
 from .shared import BasicModelParams, open_pool_session, close_pool_session, POOL
 
 
@@ -25,8 +25,7 @@ class Sequental:
         def _back_propogate(self, y):
             # Loss function gradient init
             # Note that it's the only place were we call loss function
-            loss, predict = self.common.loss_function._fwd_pass(
-                (self.last_predict, y))
+            loss, predict = self.common.loss_function._fwd_pass((self.last_predict, y))
             d_out, _ = self.common.loss_function._bwd_pass(predict, y)
 
             idx = len(self.common.layers)
@@ -59,7 +58,7 @@ class Sequental:
 
     def compile(self):
         self._parametrised_layers = [
-            layer for layer in self.layers if isinstance(layer, ParametrizedLayer)
+            layer for layer in self.layers if isinstance(layer, ParametrizedObject)
         ]
         self.params = self._ModelParams(self._parametrised_layers)
 

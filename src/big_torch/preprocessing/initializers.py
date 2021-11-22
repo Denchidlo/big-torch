@@ -3,10 +3,10 @@ import numpy as np
 import math
 from ..utils.registry import ModuleAggregator
 
-initializer_registry = ModuleAggregator('weights_initialiser')
+initializer_registry = ModuleAggregator("weights_initialiser")
 
 
-@initializer_registry.register(name='blank')
+@initializer_registry.register(name="blank")
 def blank_initializer(shape):
     return np.zeros(shape)
 

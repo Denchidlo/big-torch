@@ -3,7 +3,7 @@ import numpy as np
 
 from ..utils.registry import ModuleAggregator
 
-layer_registry = ModuleAggregator(registry_name='layers')
+layer_registry = ModuleAggregator(registry_name="layers")
 
 
 class AbstractLayer:
@@ -19,10 +19,7 @@ class AbstractLayer:
         raise NotImplementedError()
 
 
-class ParametrizedLayer(AbstractLayer):
-    def __init__(self, shape) -> None:
-        super().__init__(shape)
-
+class ParametrizedObject:
     @abstractmethod
     def blank(self):
         raise NotImplementedError()
@@ -40,9 +37,19 @@ class ParametrizedLayer(AbstractLayer):
         raise NotImplementedError()
 
     @abstractmethod
-    def apply(self, func):
+    def apply(self, func, context=None):
         raise NotImplementedError()
 
     @abstractmethod
     def binary_operation(lhs, rhs, operation):
+        raise NotImplementedError()
+
+
+class GradientInputResolver:
+    @abstractmethod
+    def handle_multiple_inputs(*gradients):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def get_handler(self, output_idx):
         raise NotImplementedError()

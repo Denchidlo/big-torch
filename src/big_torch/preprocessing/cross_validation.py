@@ -1,7 +1,7 @@
 import numpy as np
 from ..utils.registry import ModuleAggregator
 
-metric_registry = ModuleAggregator('metrics')
+metric_registry = ModuleAggregator("metrics")
 
 
 def one_hot_encoded(y, num_class):
@@ -16,8 +16,10 @@ def one_hot_encoded(y, num_class):
 def train_test_split(a, b, test_size):
     size = a.shape[0]
 
-    assert a.shape[0] == b.shape[0], 'Size of left and right hand indicies should be equal'
-    assert size > test_size, 'test_size out of range'
+    assert (
+        a.shape[0] == b.shape[0]
+    ), "Size of left and right hand indicies should be equal"
+    assert size > test_size, "test_size out of range"
 
     choice = np.random.default_rng().choice(size, test_size, replace=False)
     mask = np.array([i for i in range(size)])
@@ -25,7 +27,7 @@ def train_test_split(a, b, test_size):
     return a[mask == 0], b[mask == 0], a[mask == 1], b[mask == 1]
 
 
-@metric_registry.register('accuracy')
+@metric_registry.register("accuracy")
 def class_accuracy(y_true, y_pred):
     # both are one hot encoded
     return np.mean(np.argmax(y_pred, axis=1) == np.argmax(y_true, axis=1))

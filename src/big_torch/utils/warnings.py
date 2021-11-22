@@ -3,7 +3,8 @@ import warnings
 
 def restrict_parallel(obj):
     warnings.warn(
-        f"Parallel [{obj}] execution can lead to undefined behaviour", RuntimeWarning)
+        f"Parallel [{obj}] execution can lead to undefined behaviour", RuntimeWarning
+    )
     return obj
 
 
@@ -13,7 +14,6 @@ def deprecate(obj):
 
 
 def warn_on_create(msg, warning_type=UserWarning):
-
     def cls_new_wrapper(cls):
         old_new_handler = cls.__init__
 
@@ -22,7 +22,7 @@ def warn_on_create(msg, warning_type=UserWarning):
             obj = old_new_handler(obj, *args, **kwargs)
             return obj
 
-        setattr(cls, '__init__', _init)
+        setattr(cls, "__init__", _init)
 
         return cls
 

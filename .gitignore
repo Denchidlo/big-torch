@@ -13,8 +13,7 @@ dist
 test
 push_to_env.sh
 run.ipynb
-recurrent*
-reccurent/
+in_progress.py
 
 # Temporary excluded
 

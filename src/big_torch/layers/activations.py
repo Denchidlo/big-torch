@@ -2,12 +2,12 @@ import numpy as np
 
 from ..utils.warnings import warn_on_create
 from .abstract import AbstractLayer, layer_registry
-from .layer_mixins import DependecyCallMixin
+from .layer_mixins import DependecyCallMixin, GradientStacker1DMixin
 
 
-@layer_registry.register('sigmoid')
-class Sigmoid(AbstractLayer, DependecyCallMixin):
-    output_names = ['y']
+@layer_registry.register("sigmoid")
+class Sigmoid(AbstractLayer, DependecyCallMixin, GradientStacker1DMixin):
+    output_names = ["y"]
 
     def __init__(self, shape) -> None:
         super().__init__(shape)
@@ -20,9 +20,9 @@ class Sigmoid(AbstractLayer, DependecyCallMixin):
         return X * (1 - X) * d_out, None
 
 
-@layer_registry.register('ReLU')
-class ReLU(AbstractLayer, DependecyCallMixin):
-    output_names = ['y']
+@layer_registry.register("ReLU")
+class ReLU(AbstractLayer, DependecyCallMixin, GradientStacker1DMixin):
+    output_names = ["y"]
 
     def _fwd_pass(self, X):
         out = np.maximum(X, 0)
@@ -34,9 +34,9 @@ class ReLU(AbstractLayer, DependecyCallMixin):
         return grad_in, None
 
 
-@layer_registry.register('tanh')
-class Tanh(AbstractLayer, DependecyCallMixin):
-    output_names = ['y']
+@layer_registry.register("tanh")
+class Tanh(AbstractLayer, DependecyCallMixin, GradientStacker1DMixin):
+    output_names = ["y"]
 
     def __init__(self, shape) -> None:
         super().__init__(shape)
@@ -50,12 +50,12 @@ class Tanh(AbstractLayer, DependecyCallMixin):
 
 
 @warn_on_create(
-    msg='\'Softmax\' activation works only with \'cross-entropy\' loss. Do not even try to use it separately',
-    warning_type=RuntimeWarning
+    msg="'Softmax' activation works only with 'cross-entropy' loss. Do not even try to use it separately",
+    warning_type=RuntimeWarning,
 )
-@layer_registry.register('softmax')
-class Softmax(AbstractLayer, DependecyCallMixin):
-    output_names = ['y']
+@layer_registry.register("softmax")
+class Softmax(AbstractLayer, DependecyCallMixin, GradientStacker1DMixin):
+    output_names = ["y"]
 
     def __init__(self, shape) -> None:
         super().__init__(shape)
@@ -67,3 +67,17 @@ class Softmax(AbstractLayer, DependecyCallMixin):
 
     def _bwd_pass(self, X, d_out):
         return (X - d_out) / d_out.shape[0], None
+
+
+@layer_registry.register("plain")
+class Plain(AbstractLayer, DependecyCallMixin, GradientStacker1DMixin):
+    output_names = ["y"]
+
+    def __init__(self, shape) -> None:
+        super().__init__(shape)
+
+    def _fwd_pass(self, X):
+        return X, X
+
+    def _bwd_pass(self, X, d_out):
+        return d_out, None
